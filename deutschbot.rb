@@ -53,11 +53,9 @@ bot = Cinch::Bot.new do
     end
   end
 
-  # List all words. This will break the bot :(
-  on :message, /!list/ do |m|
-    GermanWord.all.each do |w|
-      m.reply "#{w.article} #{w.word}, #{w.definition}"
-    end
+  # Give stats about word database
+  on :message, /!stats/ do |m|
+    m.reply "#{m.user} I now know #{GermanWord.all.length} words!"
   end
 
   # Retrieve a random definition
@@ -74,6 +72,7 @@ bot = Cinch::Bot.new do
     else
       m.reply "agnaite, what does #{word} mean?"
     end
+    $answer = nil # no cheating!
   end
 
   # Quiz game
@@ -107,10 +106,11 @@ bot = Cinch::Bot.new do
     end
   end
 
+  # Give up on a quiz question
   on :message, /!giveup/ do |m|
     m.reply "#{m.user}, the answer was '#{$answer}', dumbass!"
     $answer = nil
-  end  
+  end
 end
 
 # Start the bot
