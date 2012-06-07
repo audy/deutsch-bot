@@ -1,4 +1,4 @@
-# Germanbot
+# deutschbot
 
 A bot we made to learn/teach German.
 
