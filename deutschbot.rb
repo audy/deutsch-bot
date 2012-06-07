@@ -21,7 +21,7 @@ class GermanWord
 
   def make_everything_lowercase
     self.word.downcase!
-    self.article.downcase!    
+    self.article.downcase!
   end
 end
 
@@ -30,11 +30,11 @@ GermanWord.ensure_index :word
 
 # Make the bot
 bot = Cinch::Bot.new do
-  
+
   configure do |c|
     c.server   = "irc.freenode.net"
     c.channels = [ "#heyaudy" ]
-    c.nick     = "deutchbot"
+    c.nick     = "deutschbot"
   end
 
   # Add a word to the vocabulary
