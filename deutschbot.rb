@@ -62,7 +62,7 @@ bot = Cinch::Bot.new do
       m.reply "#{m.user}, what is the word for '#{first.definition}'?"
       $answer = first.word
     when :definition # Quiz 3 - Which is the correct definition?
-      m.reply "#{m.user}, which is the correct definition for '#{first.word}'..."
+      m.reply "#{m.user}, which is the correct definition for '#{first.article} #{first.word}'..."
       choices = [first, second, third].map(&:definition).shuffle
       $answer = ['a', 'b', 'c'][choices.index(first.definition)]
       m.reply "(a) #{choices[0]} (b) #{choices[1]} or (c) #{choices[2]} ?"
