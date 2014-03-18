@@ -108,10 +108,6 @@ bot = Cinch::Bot.new do
     m.reply "#{m.user}, the answer was '#{$answer}', dumbass!"
     $answer = nil
   end
-
-  on :message, /!list/ do |m|
-    m.reply "#{m.user}, http://heyaudy.com:9998/"
-  end
 end
 
 # Start the bot
