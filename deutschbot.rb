@@ -1,32 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'bundler'
-Bundler.require
-
-# Connect to database
-MongoMapper.connection = Mongo::Connection.new '127.0.0.1'
-MongoMapper.database = "german"
-
-# Create German word
-class GermanWord
-  include MongoMapper::Document
-
-  key :word,       String, :unique => true
-  key :article,    String
-  key :definition, String
-  
-  before_validation :make_everything_lowercase
-  
-  private
-
-  def make_everything_lowercase
-    self.word.downcase!
-    self.article.downcase!
-  end
-end
-
-# So we can search the DB by word
-GermanWord.ensure_index :word
+require './environment.rb'
 
 # Make the bot
 bot = Cinch::Bot.new do
@@ -53,11 +27,9 @@ bot = Cinch::Bot.new do
     end
   end
 
-  # List all words. This will break the bot :(
-  on :message, /!list/ do |m|
-    GermanWord.all.each do |w|
-      m.reply "#{w.article} #{w.word}, #{w.definition}"
-    end
+  # Give stats about word database
+  on :message, /!stats/ do |m|
+    m.reply "#{m.user} I now know #{GermanWord.all.length} words!"
   end
 
   # Retrieve a random definition
@@ -74,6 +46,7 @@ bot = Cinch::Bot.new do
     else
       m.reply "agnaite, what does #{word} mean?"
     end
+    $answer = nil # no cheating!
   end
 
   # Quiz game
@@ -96,6 +69,29 @@ bot = Cinch::Bot.new do
     end
   end
 
+  # find all words that have match in definition
+  on :message, /!find (\w*)/ do |m, word|
+    matches = GermanWord.all :definition => Regexp.new(word)
+
+    unless matches.nil?
+      matches.each_with_index do |w, i|
+        m.reply "#{i}.) #{w.article} #{w.word}, #{w.definition}"
+      end
+    else
+      m.reply "#{m.user}, 404"
+    end
+  end
+
+  # delete a word
+  on :message, /!rm (\w*)/ do |m, word|
+    word = GermanWord.first :word => word
+    if word.destroy
+      m.reply "#{m.user}, deleted #{word}"
+    else
+      m.reply "#{m.user}, something went wrong :("
+    end
+  end
+
   # Check if user got the correct answer
   on :message, /!answer (\w*)/ do |m, answer|
     if answer == $answer
@@ -107,10 +103,15 @@ bot = Cinch::Bot.new do
     end
   end
 
+  # Give up on a quiz question
   on :message, /!giveup/ do |m|
     m.reply "#{m.user}, the answer was '#{$answer}', dumbass!"
     $answer = nil
-  end  
+  end
+
+  on :message, /!list/ do |m|
+    m.reply "#{m.user}, http://heyaudy.com:9998/"
+  end
 end
 
 # Start the bot
